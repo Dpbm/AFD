@@ -10,6 +10,7 @@ struct State{
   char *label;
   bool final;
   unsigned int last_transition_index;
+  unsigned int total_transitions;
   struct Transition **transitions;
 };
 

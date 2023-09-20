@@ -11,6 +11,7 @@ State *init_state(char *label, bool final, unsigned int alphabet_len);
 State *find_state(State **states, char *label, unsigned int total_states);
 Transition *create_transtion(char symbol, State *next);
 void add_transition(char symbol, State *next, State **parent);
+bool test(Automaton *automaton, char *sequence);
 
 int main(){
 	Alphabet *alphabet = calloc(1, sizeof(Alphabet));
@@ -105,7 +106,23 @@ int main(){
 			add_transition(symbol, state, &parent);
 		}
 	}
-	
+
+	while(1){
+
+		char *input = calloc(1, sizeof(char));
+		printf("\nInsert the sequence to test:\nType ! to stop\n");
+		scanf("%s", input);
+		
+		if(strcmp(input, "!") == 0)
+			break;
+
+		if(test(automaton, input))
+			printf("ACCEPTED!\n");
+		else
+			printf("NOT ACCEPTED!\n");
+
+	}
+
 	return 0;
 }
 
@@ -114,6 +131,7 @@ State *init_state(char *label, bool final, unsigned int alphabet_len){
 	new_state->label = label;
 	new_state->final = final;
 	new_state->last_transition_index = -1;
+	new_state->total_transitions = alphabet_len;
 	new_state->transitions = calloc(alphabet_len, sizeof(Transition*));
 	return new_state;
 }
@@ -142,4 +160,31 @@ Transition *create_transtion(char symbol, State *next){
 	transition->symbol = symbol;
 	transition->next = next;
 	return transition;
+}
+
+bool test(Automaton *automaton, char *sequence){
+	unsigned int i;
+
+	State *actual_state = automaton;
+
+	for(i = 0; i < strlen(sequence); i++){
+		
+		char symbol = sequence[i];
+
+		unsigned int transition_index;
+		for(transition_index = 0; transition_index < actual_state->total_transitions; transition_index++){
+			Transition *actual_transition = actual_state->transitions[transition_index];
+			if(actual_transition->symbol == symbol){
+				actual_state = actual_transition->next;
+
+				#if (DEBUG==1)
+					printf("new state --> %s\n", actual_state->label);
+				#endif
+
+				break;
+			}
+		}
+	}
+
+	return actual_state->final;
 }
