@@ -5,9 +5,12 @@
 #include "automaton.h"
 #include "utils.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 State *init_state(char *label, bool final, unsigned int alphabet_len);
+State *find_state(State **states, char *label, unsigned int total_states);
+Transition *create_transtion(char symbol, State *next);
+void add_transition(char symbol, State *next, State **parent);
 
 int main(){
 	Alphabet *alphabet = calloc(1, sizeof(Alphabet));
@@ -41,9 +44,9 @@ int main(){
 	scanf("%d", &total_states);
 
 	printf("\nType in each row the label of the state from your table (the same order):\n");
-	State *states = calloc(total_states, sizeof(State));
+	State **states = calloc(total_states, sizeof(State*));
 
-	int i;
+	unsigned int i;
 	for(i = 0; i < total_states; i++){
 
 		//!WARNING: MAY BE UNSECURE
@@ -66,7 +69,41 @@ int main(){
 			#endif
 		}
 
-		states[i] = *init_state(label, final, alphabet_size);
+		states[i] = init_state(label, final, alphabet_size);
+	}
+
+	automaton = states[0];
+
+	printf("\nNow type each Transition:\n");
+	unsigned int total_transitions = alphabet_size;
+	for(i = 0; i < total_states; i++){
+		
+		State *parent = states[i]; 
+
+		unsigned int j;
+		for(j = 0; j < total_transitions; j++){
+		
+			char symbol = alphabet->symbols[j];
+
+			State *state = NULL;
+			do{
+				char *label = calloc(1, sizeof(char));
+				printf("Transtion %s when the symbol is %c: ", parent->label, symbol);
+				scanf("%s", label);
+
+				state = find_state(states, label, total_states);
+
+				#if (DEBUG==1)
+					printf("!FOUND STATE!\n");
+					printf("label --> %s\n", state->label);
+				#endif
+
+				if(state == NULL)
+					printf("\nINVALID STATE %s, TYPE AGAIN!!!\n", label);
+			}while(state == NULL);
+		
+			add_transition(symbol, state, &parent);
+		}
 	}
 	
 	return 0;
@@ -76,8 +113,33 @@ State *init_state(char *label, bool final, unsigned int alphabet_len){
 	State *new_state = calloc(1, sizeof(State));
 	new_state->label = label;
 	new_state->final = final;
-	new_state->total_transitions = alphabet_len;
-	new_state->transitions = calloc(alphabet_len, sizeof(Transition));
+	new_state->last_transition_index = -1;
+	new_state->transitions = calloc(alphabet_len, sizeof(Transition*));
 	return new_state;
 }
 
+State *find_state(State **states, char *label, unsigned int total_states){
+	unsigned int i;
+	for(i = 0; i < total_states; i++){
+		State *actual_state = states[i];
+		if(strcmp(actual_state->label, label) == 0)
+			return actual_state;
+	}
+
+	return NULL;
+}
+
+
+void add_transition(char symbol, State *next, State **parent){
+	Transition *transition = create_transtion(symbol, next);
+	unsigned int new_last_index = (*parent)->last_transition_index+1;
+	(*parent)->transitions[new_last_index] = transition;
+	(*parent)->last_transition_index = new_last_index;
+}
+
+Transition *create_transtion(char symbol, State *next){
+	Transition *transition = calloc(1, sizeof(Transition));
+	transition->symbol = symbol;
+	transition->next = next;
+	return transition;
+}

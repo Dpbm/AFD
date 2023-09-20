@@ -9,8 +9,8 @@ typedef struct Alphabet {
 struct State{
   char *label;
   bool final;
-  unsigned int total_transitions;
-  struct Transition *transitions;
+  unsigned int last_transition_index;
+  struct Transition **transitions;
 };
 
 typedef struct State State;
