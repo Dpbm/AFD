@@ -24,7 +24,8 @@ int main(){
 
 	Alphabet *alphabet = calloc(1, sizeof(Alphabet));
 	alphabet->size = alphabet_size;
-	alphabet->symbols = alphabet_symbols;
+	alphabet->symbols = calloc(alphabet_size, sizeof(char));
+	strcpy(alphabet->symbols, alphabet_symbols);
 
 	#if (DEBUG==1)
 		printf("size --> %d\n", alphabet_size);
@@ -34,44 +35,21 @@ int main(){
 	free(alphabet_symbols);
 	
 	printf("\nType in each row the label of the state from your table (the same order):\nType ! to stop\n");
-	StatesList *states_list = get_states(alphaet_size);
+	StatesList *states_list = get_states(alphabet_size);
 	if(states_list->states == NULL){
 		printf("No states were provided!\n");
 		return 1;
 	}
 	
-	Automaton *automaton = states_list->states[0];
+	State **states = states_list->states; 
+	Automaton *automaton = states[0];
 
 	printf("\nNow type each Transition:\n");
 	unsigned int total_transitions = alphabet_size;
-	//for(i = 0; i < total_states; i++){
-		
-		//State *parent = states[i]; 
+	unsigned int total_states = states_list->total_states;
 
-		//unsigned int j;
-		//for(j = 0; j < total_transitions; j++){
-		
-			//char symbol = alphabet->symbols[j];
+	add_transitions(alphabet, states, total_states, total_transitions);
 
-			//State *state = NULL;
-			//do{
-				//printf("Transtion %s when the symbol is %c: ", parent->label, symbol);
-				//char *label = get_string();
-
-				//state = find_state(states, label, total_states);
-
-				//#if (DEBUG==1)
-					//printf("!FOUND STATE!\n");
-					//printf("label --> %s\n", state->label);
-				//#endif
-
-				//if(state == NULL)
-					//printf("\nINVALID STATE %s, TYPE AGAIN!!!\n", label);
-			//}while(state == NULL);
-		
-			//add_transition(symbol, state, &parent);
-		//}
-	//}
 
 	while(1){
 

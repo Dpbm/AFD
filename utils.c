@@ -6,13 +6,18 @@
 
 char *remove_first_char(char *text){
 	unsigned int text_len = strlen(text);
-	char *new_text = calloc(text_len-1, sizeof(char));
-	
+	char *new_text = calloc(text_len, sizeof(char));
 	unsigned int i;
+
+	#if (DEBUG==1)
+		printf("\n\n--REMOVE FIRST CHAR--\n");
+		printf("text: %s\n", text);
+		printf("length: %d\n", text_len);
+	#endif
 
 	for(i = 1; i < text_len; i++)
 		new_text[i-1] = text[i];
-	
+
 	return new_text;
 }
 

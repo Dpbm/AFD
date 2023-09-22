@@ -33,8 +33,8 @@ typedef struct Transition{
 State *init_state(char *label, bool final, unsigned int alphabet_len);
 State *find_state(State **states, char *label, unsigned int total_states);
 Transition *create_transtion(char symbol, State *next);
-void add_transition(char symbol, State *next, State **parent);
 bool test(Automaton *automaton, char *sequence);
 StatesList *get_states(unsigned int total_transitions);
+void add_transitions(Alphabet *alphabet, State **states, unsigned int total_states, unsigned int total_transitions);
 
 #endif // !AUTOMATON

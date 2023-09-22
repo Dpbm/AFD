@@ -4,10 +4,19 @@
 #include <stdio.h>
 #include "automaton.h"
 #include "utils.h"
+#include "debug.h"
 
 State *init_state(char *label, bool final, unsigned int total_transitions){
+	#if(DEBUG==1)
+		printf("\n\n--CREATING STATE--\n");
+		printf("label: %s\n",label);
+		printf("final: %d\n",final);
+		printf("total transitions: %d\n\n", total_transitions);
+	#endif
+
 	State *new_state = calloc(1, sizeof(State));
-	new_state->label = label;
+	new_state->label = calloc(strlen(label), sizeof(char));
+	strcpy(new_state->label, label);
 	new_state->final = final;
 	new_state->last_transition_index = -1;
 	new_state->total_transitions = total_transitions;
@@ -69,20 +78,22 @@ bool test(Automaton *automaton, char *sequence){
 }
 
 
+char *get_label(){
+	char *label = NULL;
+	do{
+		label = get_string();
+		if(label == NULL)
+			printf("\nType the label of the state!\n");
+	}while(label == NULL);
+	return label;
+}
+
 StatesList *get_states(unsigned int total_transitions){
 	unsigned int total_states = 0;
 	State **states = NULL;
 	
 	while(1){
-		char *label = NULL;
-
-		do{
-
-			label = get_string();
-			if(label == NULL)
-				printf("\nType the label of the state!\n");
-		
-		}while(label == NULL);
+		char *label = get_label();
 		
 		if(strcmp(label, "!") == 0)
 			break;
@@ -99,14 +110,15 @@ StatesList *get_states(unsigned int total_transitions){
 		
 		if(label[0] == '*'){
 			final = true;
-			label = remove_first_char(label);
-			
+			char *new_label = remove_first_char(label);
+			strcpy(label, new_label);
+			free(new_label);
 			#if(DEBUG==1)
-				printf("\n\n--INSERTED A FINAL STAETE--\n");
+				printf("\n\n--INSERTED A FINAL STATE--\n");
 				printf("label updated: %s\n\n", label);
 			#endif
 		}
-	
+		
 		states[total_states-1] = init_state(label, final, total_transitions);
 		free(label);
 	}
@@ -115,5 +127,49 @@ StatesList *get_states(unsigned int total_transitions){
 	states_list->total_states = total_states;
 	states_list->states = states;
 
+	for(int i = 0; i < total_states; i++){
+		printf("state --> %s\n", states[i]->label);
+	}
+
 	return states_list;
+}
+
+void add_transitions(Alphabet *alphabet, State **states, unsigned int total_states, unsigned int total_transitions){
+	unsigned int i;
+	for(i = 0; i < total_states; i++){
+
+		State *parent = states[i]; 
+
+		#if(DEBUG==1)
+			printf("\n\n--PARENT--\n");
+			printf("label: %s\n\n", parent->label);
+		#endif
+
+		unsigned int j;
+		for(j = 0; j < total_transitions; j++){
+		
+			char symbol = alphabet->symbols[j];
+
+			State *state = NULL;
+			
+		 	do{
+				printf("Transtion %s when the symbol is %c: ", parent->label, symbol);
+				char *label = get_label();
+
+				state = find_state(states, label, total_states);
+
+				#if (DEBUG==1)
+					printf("\n\n--FOUND STATE--\n");
+					printf("label: %s\n\n", state->label);
+				#endif
+
+				if(state == NULL)
+					printf("\nINVALID STATE %s, TYPE AGAIN!!!\n", label);
+
+				free(label);
+			}while(state == NULL);
+		
+			add_transition(symbol, state, &parent);
+		}
+	}
 }
