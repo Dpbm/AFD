@@ -16,10 +16,13 @@ struct State{
   struct Transition **transitions;
 };
 
+typedef struct StatesList{
+  unsigned int total_states;
+  struct State **states;
+} StatesList;
+
 typedef struct State State;
 typedef struct State Automaton;
-
-
 
 typedef struct Transition{
   char symbol;
@@ -32,5 +35,6 @@ State *find_state(State **states, char *label, unsigned int total_states);
 Transition *create_transtion(char symbol, State *next);
 void add_transition(char symbol, State *next, State **parent);
 bool test(Automaton *automaton, char *sequence);
+StatesList *get_states(unsigned int total_transitions);
 
 #endif // !AUTOMATON

@@ -4,108 +4,79 @@
 #include <string.h>
 #include "automaton.h"
 #include "utils.h"
-
-#define DEBUG 0
+#include "debug.h"
 
 int main(){
-	Alphabet *alphabet = calloc(1, sizeof(Alphabet));
-	
-	unsigned int alphabet_size = 0;
-	printf("Alphabet Size: ");
-	scanf("%d", &alphabet_size);
 
-	char *alphabet_symbols = calloc(alphabet_size, sizeof(char));
 	printf("Aphabet symbols (insert all symbols without separation between them): ");
-	scanf("%s", alphabet_symbols);
-
-	if(strlen(alphabet_symbols) != alphabet_size){
-		printf("Alphabet is different in size!");
+	
+	char *alphabet_symbols = get_string();
+	if(alphabet_symbols == NULL){
+		printf("Invalid symbols!!!\n");
 		return 1;
 	}
 
+	unsigned int alphabet_size = strlen(alphabet_symbols);
+	if(alphabet_size <= 0){
+		printf("Invalid Alphabet size!\n");
+		return 1;
+	}
+
+	Alphabet *alphabet = calloc(1, sizeof(Alphabet));
 	alphabet->size = alphabet_size;
 	alphabet->symbols = alphabet_symbols;
-	
+
 	#if (DEBUG==1)
 		printf("size --> %d\n", alphabet_size);
 		printf("symbols --> %s\n", alphabet_symbols);
 	#endif 
+
+	free(alphabet_symbols);
 	
-	
-	Automaton *automaton = NULL;
-
-	unsigned int total_states = 0;
-	printf("\nHow many states do you have? ");
-	scanf("%d", &total_states);
-
-	printf("\nType in each row the label of the state from your table (the same order):\n");
-	State **states = calloc(total_states, sizeof(State*));
-
-	unsigned int i;
-	for(i = 0; i < total_states; i++){
-
-		//!WARNING: MAY BE UNSECURE
-		char *label = calloc(1, sizeof(char));
-		bool final = false;
-
-		scanf("%s", label);
-
-		#if(DEBUG==1)
-			printf("label --> %s\n", label);
-		#endif
-
-		if(label[0] == '*'){
-			final = true;
-			label = remove_first_char(label);
-			
-			#if(DEBUG==1)
-				printf("!final state!\n");
-				printf("label updated --> %s\n", label);
-			#endif
-		}
-
-		states[i] = init_state(label, final, alphabet_size);
+	printf("\nType in each row the label of the state from your table (the same order):\nType ! to stop\n");
+	StatesList *states_list = get_states(alphaet_size);
+	if(states_list->states == NULL){
+		printf("No states were provided!\n");
+		return 1;
 	}
-
-	automaton = states[0];
+	
+	Automaton *automaton = states_list->states[0];
 
 	printf("\nNow type each Transition:\n");
 	unsigned int total_transitions = alphabet_size;
-	for(i = 0; i < total_states; i++){
+	//for(i = 0; i < total_states; i++){
 		
-		State *parent = states[i]; 
+		//State *parent = states[i]; 
 
-		unsigned int j;
-		for(j = 0; j < total_transitions; j++){
+		//unsigned int j;
+		//for(j = 0; j < total_transitions; j++){
 		
-			char symbol = alphabet->symbols[j];
+			//char symbol = alphabet->symbols[j];
 
-			State *state = NULL;
-			do{
-				char *label = calloc(1, sizeof(char));
-				printf("Transtion %s when the symbol is %c: ", parent->label, symbol);
-				scanf("%s", label);
+			//State *state = NULL;
+			//do{
+				//printf("Transtion %s when the symbol is %c: ", parent->label, symbol);
+				//char *label = get_string();
 
-				state = find_state(states, label, total_states);
+				//state = find_state(states, label, total_states);
 
-				#if (DEBUG==1)
-					printf("!FOUND STATE!\n");
-					printf("label --> %s\n", state->label);
-				#endif
+				//#if (DEBUG==1)
+					//printf("!FOUND STATE!\n");
+					//printf("label --> %s\n", state->label);
+				//#endif
 
-				if(state == NULL)
-					printf("\nINVALID STATE %s, TYPE AGAIN!!!\n", label);
-			}while(state == NULL);
+				//if(state == NULL)
+					//printf("\nINVALID STATE %s, TYPE AGAIN!!!\n", label);
+			//}while(state == NULL);
 		
-			add_transition(symbol, state, &parent);
-		}
-	}
+			//add_transition(symbol, state, &parent);
+		//}
+	//}
 
 	while(1){
 
-		char *input = calloc(1, sizeof(char));
 		printf("\nInsert the sequence to test:\nType ! to stop\n");
-		scanf("%s", input);
+		char *input = get_string();
 		
 		if(strcmp(input, "!") == 0)
 			break;
@@ -119,3 +90,4 @@ int main(){
 
 	return 0;
 }
+

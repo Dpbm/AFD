@@ -1,16 +1,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "automaton.h"
+#include "utils.h"
 
-
-State *init_state(char *label, bool final, unsigned int alphabet_len){
+State *init_state(char *label, bool final, unsigned int total_transitions){
 	State *new_state = calloc(1, sizeof(State));
 	new_state->label = label;
 	new_state->final = final;
 	new_state->last_transition_index = -1;
-	new_state->total_transitions = alphabet_len;
-	new_state->transitions = calloc(alphabet_len, sizeof(Transition*));
+	new_state->total_transitions = total_transitions;
+	new_state->transitions = calloc(total_transitions, sizeof(Transition*));
 	return new_state;
 }
 
@@ -65,4 +66,54 @@ bool test(Automaton *automaton, char *sequence){
 	}
 
 	return actual_state->final;
+}
+
+
+StatesList *get_states(unsigned int total_transitions){
+	unsigned int total_states = 0;
+	State **states = NULL;
+	
+	while(1){
+		char *label = NULL;
+
+		do{
+
+			label = get_string();
+			if(label == NULL)
+				printf("\nType the label of the state!\n");
+		
+		}while(label == NULL);
+		
+		if(strcmp(label, "!") == 0)
+			break;
+	
+		total_states++;
+		states = (State**)realloc(states, total_states);
+
+		bool final = false;
+
+		#if(DEBUG==1)
+			printf("\n\n--INPUT LABEL--\n");
+			printf("label: %s\n\n", label);
+		#endif
+		
+		if(label[0] == '*'){
+			final = true;
+			label = remove_first_char(label);
+			
+			#if(DEBUG==1)
+				printf("\n\n--INSERTED A FINAL STAETE--\n");
+				printf("label updated: %s\n\n", label);
+			#endif
+		}
+	
+		states[total_states-1] = init_state(label, final, total_transitions);
+		free(label);
+	}
+	
+	StatesList *states_list = calloc(1, sizeof(StatesList));
+	states_list->total_states = total_states;
+	states_list->states = states;
+
+	return states_list;
 }
