@@ -5,7 +5,7 @@
 #include "automaton.h"
 #include "utils.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 int main(){
 	Alphabet *alphabet = calloc(1, sizeof(Alphabet));
@@ -14,9 +14,21 @@ int main(){
 	printf("Alphabet Size: ");
 	scanf("%d", &alphabet_size);
 
+	if(alphabet_size <= 0){
+		printf("Invalid Alphabet Size!!\n");
+		return 1;
+	}
+
 	char *alphabet_symbols = calloc(alphabet_size, sizeof(char));
-	printf("Aphabet symbols (insert all symbols without separation between them): ");
+	printf("\nAphabet symbols\nInsert all symbols WITHOUT SEPARATION between them: ");
 	scanf("%s", alphabet_symbols);
+
+	#if (DEBUG==1)
+		printf("\n\n--ALPHABET--\n");
+		printf("size: %d\n", alphabet_size);
+		printf("strlen(): %d\n", strlen(alphabet_symbols));
+		printf("symbols: %s\n", alphabet_symbols);
+	#endif 
 
 	if(strlen(alphabet_symbols) != alphabet_size){
 		printf("Alphabet is different in size!");
@@ -25,12 +37,6 @@ int main(){
 
 	alphabet->size = alphabet_size;
 	alphabet->symbols = alphabet_symbols;
-	
-	#if (DEBUG==1)
-		printf("size --> %d\n", alphabet_size);
-		printf("symbols --> %s\n", alphabet_symbols);
-	#endif 
-	
 	
 	Automaton *automaton = NULL;
 
