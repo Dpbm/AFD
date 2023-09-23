@@ -22,7 +22,7 @@ int main(){
 	}
 
 	char *alphabet_symbols = (char*)calloc(alphabet_size, sizeof(char));
-	printf("\nAphabet symbols\nInsert all symbols WITHOUT SEPARATION between them: ");
+	printf("\nAlphabet symbols\nInsert all symbols WITHOUT SEPARATION between them: ");
 	scanf("%s", alphabet_symbols);
 
 	#if (DEBUG==1)
@@ -76,7 +76,8 @@ int main(){
 
 	Automaton *automaton = states[0];
 
-	printf("\nNow type each Transition:\n");
+	printf("\nType each Transition\n");
+
 	unsigned int total_transitions = alphabet_size;
 	for(i = 0; i < total_states; i++){
 		
@@ -89,29 +90,35 @@ int main(){
 
 			State *state = NULL;
 			do{
-				char *label = calloc(1, sizeof(char));
-				printf("Transtion %s when the symbol is %c: ", parent->label, symbol);
-				scanf("%s", label);
+				printf("Transtion from %s when the symbol is %c: ", parent->label, symbol);
+				char *label = get_label();
 
 				state = find_state(states, label, total_states);
 
 				#if (DEBUG==1)
-					printf("!FOUND STATE!\n");
-					printf("label --> %s\n", state->label);
+					if(state != NULL){
+						printf("\n\n--FOUND STATE--\n");
+						printf("label: %s\n\n", state->label);
+					}else{
+						printf("\n\n--NOT FOUND STATE--\n");
+						printf("input label: %s\n\n", label);
+					}
 				#endif
 
 				if(state == NULL)
 					printf("\nINVALID STATE %s, TYPE AGAIN!!!\n", label);
+
 			}while(state == NULL);
 		
 			add_transition(symbol, state, &parent);
 		}
 	}
+	free(states);
 
 	while(1){
 
 		char *input = calloc(1, sizeof(char));
-		printf("\nInsert the sequence to test:\nType ! to stop\n");
+		printf("\nInsert the sequence to test\nType '!' to STOP\n");
 		scanf("%s", input);
 		
 		if(strcmp(input, "!") == 0)
