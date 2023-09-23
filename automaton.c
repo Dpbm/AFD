@@ -127,10 +127,6 @@ StatesList *get_states(unsigned int total_transitions){
 	states_list->total_states = total_states;
 	states_list->states = states;
 
-	for(int i = 0; i < total_states; i++){
-		printf("state --> %s\n", states[i]->label);
-	}
-
 	return states_list;
 }
 
