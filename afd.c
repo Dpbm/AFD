@@ -5,7 +5,7 @@
 #include "automaton.h"
 #include "utils.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 char *get_label();
 
@@ -17,7 +17,7 @@ int main(){
 	scanf("%d", &alphabet_size);
 
 	if(alphabet_size <= 0){
-		printf("Invalid Alphabet Size!!\n");
+		printf("INVALID ALPHABET SIZE!!\n");
 		return 1;
 	}
 
@@ -33,7 +33,7 @@ int main(){
 	#endif 
 
 	if(strlen(alphabet_symbols) != alphabet_size){
-		printf("Alphabet is different in size!");
+		printf("ALPHABET IS DIFFERENT IN SIZE!\n");
 		return 1;
 	}
 
@@ -46,7 +46,7 @@ int main(){
 	printf("\nHow many states do you have? ");
 	scanf("%d", &total_states);
 
-	printf("\nType in each row the label of the state from your table (USE THE SAME ORDER)\n");
+	printf("\nType in each row the label of the state from your table (USE THE SAME ORDER)\nmark the FINAL STATE with a '*' BEFORE its label\n");
 	State **states = calloc(total_states, sizeof(State*));
 	
 	unsigned int i;
@@ -116,15 +116,15 @@ int main(){
 	free(states);
 
 	while(1){
-
-		char *input = calloc(1, sizeof(char));
+		unsigned int sequence_buffer_size = 50;
+		char *input = (char*)calloc(sequence_buffer_size, sizeof(char));
 		printf("\nInsert the sequence to test\nType '!' to STOP\n");
 		scanf("%s", input);
 		
 		if(strcmp(input, "!") == 0)
 			break;
 
-		if(test(automaton, input))
+		if(test(automaton, alphabet, input))
 			printf("ACCEPTED!\n");
 		else
 			printf("NOT ACCEPTED!\n");

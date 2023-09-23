@@ -7,7 +7,6 @@ char *remove_first_char(char *text){
 	char *new_text = (char*)calloc(text_len-1, sizeof(char));
 	
 	unsigned int i;
-
 	for(i = 1; i < text_len; i++)
 		new_text[i-1] = text[i];
 	
