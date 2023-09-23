@@ -10,7 +10,7 @@
 char *get_label();
 
 int main(){
-	Alphabet *alphabet = calloc(1, sizeof(Alphabet));
+	Alphabet *alphabet = (Alphabet*)calloc(1, sizeof(Alphabet));
 	
 	unsigned int alphabet_size = 0;
 	printf("Alphabet Size: ");
@@ -21,7 +21,7 @@ int main(){
 		return 1;
 	}
 
-	char *alphabet_symbols = calloc(alphabet_size, sizeof(char));
+	char *alphabet_symbols = (char*)calloc(alphabet_size, sizeof(char));
 	printf("\nAphabet symbols\nInsert all symbols WITHOUT SEPARATION between them: ");
 	scanf("%s", alphabet_symbols);
 
@@ -38,9 +38,9 @@ int main(){
 	}
 
 	alphabet->size = alphabet_size;
-	alphabet->symbols = alphabet_symbols;
-
-
+	alphabet->symbols = (char*)calloc(alphabet_size, sizeof(char));
+	strcpy(alphabet->symbols, alphabet_symbols);
+	free(alphabet_symbols);
 
 	unsigned int total_states = 0;
 	printf("\nHow many states do you have? ");
