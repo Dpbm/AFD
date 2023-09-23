@@ -7,8 +7,6 @@
 
 #define DEBUG 0
 
-char *get_label();
-
 int main(){
 	Alphabet *alphabet = (Alphabet*)calloc(1, sizeof(Alphabet));
 	
@@ -134,9 +132,3 @@ int main(){
 	return 0;
 }
 
-char *get_label(){
-	int max_label_size = 20;
-	char *buffer = (char*)calloc(max_label_size, sizeof(char));
-	scanf("%s", buffer);
-	return buffer;
-}

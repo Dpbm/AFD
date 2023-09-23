@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -80,3 +81,9 @@ bool test(Automaton *automaton, Alphabet *alphabet, char *sequence){
 	return actual_state->final;
 }
 
+char *get_label(){
+	int max_label_size = 20;
+	char *buffer = (char*)calloc(max_label_size, sizeof(char));
+	scanf("%s", buffer);
+	return buffer;
+}

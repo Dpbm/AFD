@@ -29,5 +29,6 @@ State *find_state(State **states, char *label, unsigned int total_states);
 Transition *create_transtion(char symbol, State *next);
 void add_transition(char symbol, State *next, State **parent);
 bool test(Automaton *automaton, Alphabet *alphabet, char *sequence);
+char *get_label();
 
 #endif
