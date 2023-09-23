@@ -4,13 +4,16 @@
 #include "automaton.h"
 
 
-State *init_state(char *label, bool final, unsigned int alphabet_len){
+State *init_state(char *label, bool final, unsigned int total_transitions){
 	State *new_state = calloc(1, sizeof(State));
-	new_state->label = label;
+	
+	new_state->label = (char*)calloc(strlen(label), sizeof(char));
+	strcpy(new_state->label, label);
+
 	new_state->final = final;
 	new_state->last_transition_index = -1;
-	new_state->total_transitions = alphabet_len;
-	new_state->transitions = calloc(alphabet_len, sizeof(Transition*));
+	new_state->total_transitions = total_transitions;
+	new_state->transitions = calloc(total_transitions, sizeof(Transition*));
 	return new_state;
 }
 
@@ -40,29 +43,40 @@ Transition *create_transtion(char symbol, State *next){
 	return transition;
 }
 
-bool test(Automaton *automaton, char *sequence){
+bool symbol_in_alphabet(Alphabet *alphabet, char symbol){
 	unsigned int i;
+	for(i = 0; i < alphabet->size; i++)
+		if(alphabet->symbols[i] == symbol)
+			return true;
 
+	return false;
+}
+
+bool test(Automaton *automaton, Alphabet *alphabet, char *sequence){
+	unsigned int i;
+	unsigned int sequence_len = strlen(sequence);
 	State *actual_state = automaton;
 
-	for(i = 0; i < strlen(sequence); i++){
-		
+	for(i = 0; i < sequence_len; i++){
 		char symbol = sequence[i];
 
+		if(!symbol_in_alphabet(alphabet, symbol))
+			return false;
+
+		unsigned int state_total_transitions = actual_state->total_transitions; 
 		unsigned int transition_index;
-		for(transition_index = 0; transition_index < actual_state->total_transitions; transition_index++){
+		for(transition_index = 0; transition_index < state_total_transitions; transition_index++){
+		
 			Transition *actual_transition = actual_state->transitions[transition_index];
+
 			if(actual_transition->symbol == symbol){
 				actual_state = actual_transition->next;
-
-				#if (DEBUG==1)
-					printf("new state --> %s\n", actual_state->label);
-				#endif
-
 				break;
 			}
+
 		}
 	}
 
 	return actual_state->final;
 }
+

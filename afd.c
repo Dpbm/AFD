@@ -7,51 +7,57 @@
 
 #define DEBUG 0
 
+char *get_label();
+
 int main(){
-	Alphabet *alphabet = calloc(1, sizeof(Alphabet));
+	Alphabet *alphabet = (Alphabet*)calloc(1, sizeof(Alphabet));
 	
 	unsigned int alphabet_size = 0;
 	printf("Alphabet Size: ");
 	scanf("%d", &alphabet_size);
 
-	char *alphabet_symbols = calloc(alphabet_size, sizeof(char));
-	printf("Aphabet symbols (insert all symbols without separation between them): ");
+	if(alphabet_size <= 0){
+		printf("INVALID ALPHABET SIZE!!\n");
+		return 1;
+	}
+
+	char *alphabet_symbols = (char*)calloc(alphabet_size, sizeof(char));
+	printf("\nAlphabet symbols\nInsert all symbols WITHOUT SEPARATION between them: ");
 	scanf("%s", alphabet_symbols);
 
+	#if (DEBUG==1)
+		printf("\n\n--ALPHABET--\n");
+		printf("size: %d\n", alphabet_size);
+		printf("strlen(): %d\n", strlen(alphabet_symbols));
+		printf("symbols: %s\n\n", alphabet_symbols);
+	#endif 
+
 	if(strlen(alphabet_symbols) != alphabet_size){
-		printf("Alphabet is different in size!");
+		printf("ALPHABET IS DIFFERENT IN SIZE!\n");
 		return 1;
 	}
 
 	alphabet->size = alphabet_size;
-	alphabet->symbols = alphabet_symbols;
-	
-	#if (DEBUG==1)
-		printf("size --> %d\n", alphabet_size);
-		printf("symbols --> %s\n", alphabet_symbols);
-	#endif 
-	
-	
-	Automaton *automaton = NULL;
+	alphabet->symbols = (char*)calloc(alphabet_size, sizeof(char));
+	strcpy(alphabet->symbols, alphabet_symbols);
+	free(alphabet_symbols);
 
 	unsigned int total_states = 0;
 	printf("\nHow many states do you have? ");
 	scanf("%d", &total_states);
 
-	printf("\nType in each row the label of the state from your table (the same order):\n");
+	printf("\nType in each row the label of the state from your table (USE THE SAME ORDER)\nmark the FINAL STATE with a '*' BEFORE its label\n");
 	State **states = calloc(total_states, sizeof(State*));
-
+	
 	unsigned int i;
 	for(i = 0; i < total_states; i++){
 
-		//!WARNING: MAY BE UNSECURE
-		char *label = calloc(1, sizeof(char));
+		char *label = get_label();
 		bool final = false;
 
-		scanf("%s", label);
-
 		#if(DEBUG==1)
-			printf("label --> %s\n", label);
+			printf("\n\n--INPUT LABEL--\n");
+			printf("label: %s\n\n", label);
 		#endif
 
 		if(label[0] == '*'){
@@ -59,17 +65,19 @@ int main(){
 			label = remove_first_char(label);
 			
 			#if(DEBUG==1)
-				printf("!final state!\n");
-				printf("label updated --> %s\n", label);
+				printf("\n\n--FINAL STATE--\n");
+				printf("label updated: %s\n\n", label);
 			#endif
 		}
 
 		states[i] = init_state(label, final, alphabet_size);
+		free(label);
 	}
 
-	automaton = states[0];
+	Automaton *automaton = states[0];
 
-	printf("\nNow type each Transition:\n");
+	printf("\nType each Transition\n");
+
 	unsigned int total_transitions = alphabet_size;
 	for(i = 0; i < total_states; i++){
 		
@@ -82,35 +90,41 @@ int main(){
 
 			State *state = NULL;
 			do{
-				char *label = calloc(1, sizeof(char));
-				printf("Transtion %s when the symbol is %c: ", parent->label, symbol);
-				scanf("%s", label);
+				printf("Transtion from %s when the symbol is %c: ", parent->label, symbol);
+				char *label = get_label();
 
 				state = find_state(states, label, total_states);
 
 				#if (DEBUG==1)
-					printf("!FOUND STATE!\n");
-					printf("label --> %s\n", state->label);
+					if(state != NULL){
+						printf("\n\n--FOUND STATE--\n");
+						printf("label: %s\n\n", state->label);
+					}else{
+						printf("\n\n--NOT FOUND STATE--\n");
+						printf("input label: %s\n\n", label);
+					}
 				#endif
 
 				if(state == NULL)
 					printf("\nINVALID STATE %s, TYPE AGAIN!!!\n", label);
+
 			}while(state == NULL);
 		
 			add_transition(symbol, state, &parent);
 		}
 	}
+	free(states);
 
 	while(1){
-
-		char *input = calloc(1, sizeof(char));
-		printf("\nInsert the sequence to test:\nType ! to stop\n");
+		unsigned int sequence_buffer_size = 50;
+		char *input = (char*)calloc(sequence_buffer_size, sizeof(char));
+		printf("\nInsert the sequence to test\nType '!' to STOP\n");
 		scanf("%s", input);
 		
 		if(strcmp(input, "!") == 0)
 			break;
 
-		if(test(automaton, input))
+		if(test(automaton, alphabet, input))
 			printf("ACCEPTED!\n");
 		else
 			printf("NOT ACCEPTED!\n");
@@ -118,4 +132,11 @@ int main(){
 	}
 
 	return 0;
+}
+
+char *get_label(){
+	int max_label_size = 20;
+	char *buffer = (char*)calloc(max_label_size, sizeof(char));
+	scanf("%s", buffer);
+	return buffer;
 }
