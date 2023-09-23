@@ -4,13 +4,16 @@
 #include "automaton.h"
 
 
-State *init_state(char *label, bool final, unsigned int alphabet_len){
+State *init_state(char *label, bool final, unsigned int total_transitions){
 	State *new_state = calloc(1, sizeof(State));
-	new_state->label = label;
+	
+	new_state->label = (char*)calloc(strlen(label), sizeof(char));
+	strcpy(new_state->label, label);
+
 	new_state->final = final;
 	new_state->last_transition_index = -1;
-	new_state->total_transitions = alphabet_len;
-	new_state->transitions = calloc(alphabet_len, sizeof(Transition*));
+	new_state->total_transitions = total_transitions;
+	new_state->transitions = calloc(total_transitions, sizeof(Transition*));
 	return new_state;
 }
 

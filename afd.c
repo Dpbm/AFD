@@ -7,6 +7,8 @@
 
 #define DEBUG 1
 
+char *get_label();
+
 int main(){
 	Alphabet *alphabet = calloc(1, sizeof(Alphabet));
 	
@@ -27,7 +29,7 @@ int main(){
 		printf("\n\n--ALPHABET--\n");
 		printf("size: %d\n", alphabet_size);
 		printf("strlen(): %d\n", strlen(alphabet_symbols));
-		printf("symbols: %s\n", alphabet_symbols);
+		printf("symbols: %s\n\n", alphabet_symbols);
 	#endif 
 
 	if(strlen(alphabet_symbols) != alphabet_size){
@@ -37,27 +39,25 @@ int main(){
 
 	alphabet->size = alphabet_size;
 	alphabet->symbols = alphabet_symbols;
-	
-	Automaton *automaton = NULL;
+
+
 
 	unsigned int total_states = 0;
 	printf("\nHow many states do you have? ");
 	scanf("%d", &total_states);
 
-	printf("\nType in each row the label of the state from your table (the same order):\n");
+	printf("\nType in each row the label of the state from your table (USE THE SAME ORDER)\n");
 	State **states = calloc(total_states, sizeof(State*));
-
+	
 	unsigned int i;
 	for(i = 0; i < total_states; i++){
 
-		//!WARNING: MAY BE UNSECURE
-		char *label = calloc(1, sizeof(char));
+		char *label = get_label();
 		bool final = false;
 
-		scanf("%s", label);
-
 		#if(DEBUG==1)
-			printf("label --> %s\n", label);
+			printf("\n\n--INPUT LABEL--\n");
+			printf("label: %s\n\n", label);
 		#endif
 
 		if(label[0] == '*'){
@@ -65,15 +65,16 @@ int main(){
 			label = remove_first_char(label);
 			
 			#if(DEBUG==1)
-				printf("!final state!\n");
-				printf("label updated --> %s\n", label);
+				printf("\n\n--FINAL STATE--\n");
+				printf("label updated: %s\n\n", label);
 			#endif
 		}
 
 		states[i] = init_state(label, final, alphabet_size);
+		free(label);
 	}
 
-	automaton = states[0];
+	Automaton *automaton = states[0];
 
 	printf("\nNow type each Transition:\n");
 	unsigned int total_transitions = alphabet_size;
@@ -124,4 +125,11 @@ int main(){
 	}
 
 	return 0;
+}
+
+char *get_label(){
+	int max_label_size = 20;
+	char *buffer = (char*)calloc(max_label_size, sizeof(char));
+	scanf("%s", buffer);
+	return buffer;
 }

@@ -4,7 +4,7 @@
 
 char *remove_first_char(char *text){
 	unsigned int text_len = strlen(text);
-	char *new_text = calloc(text_len-1, sizeof(char));
+	char *new_text = (char*)calloc(text_len-1, sizeof(char));
 	
 	unsigned int i;
 

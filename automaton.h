@@ -27,7 +27,7 @@ typedef struct Transition{
 } Transition;
 
 
-State *init_state(char *label, bool final, unsigned int alphabet_len);
+State *init_state(char *label, bool final, unsigned int total_transitions);
 State *find_state(State **states, char *label, unsigned int total_states);
 Transition *create_transtion(char symbol, State *next);
 void add_transition(char symbol, State *next, State **parent);
